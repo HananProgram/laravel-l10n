@@ -10,10 +10,11 @@
     "stichoza/google-translate-php": "^5.3"
   },
   "autoload": {
-    "psr-4": {
-      "HananProgram\\L10n\\": "src/"
-    }
+  "psr-4": {
+    "HananProgram\\L10n\\": "src/"
   },
+  "files": ["src/helpers.php"]
+},
   "extra": {
     "laravel": {
       "providers": [
