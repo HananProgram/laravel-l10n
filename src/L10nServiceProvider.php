@@ -13,33 +13,22 @@ class L10nServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/l10n.php', 'l10n');
     }
 
-    public function boot(): void
-    {  
+  public function boot(): void
+    {
         $this->publishes([__DIR__.'/../config/l10n.php' => config_path('l10n.php')], 'l10n-config');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'l10n');
         $this->loadRoutesFrom(__DIR__.'/../routes/l10n.php');
-
-        // تشغيل هجرات الباكج تلقائياً دون نشر
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        // اختياري: إتاحة publish للهجرات
-        $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'l10n-migrations');
+        // ✅ ميدلوير اللغة يضاف تلقائيًا لكل مشروع
+        $this->app['router']->pushMiddlewareToGroup('web', \HananProgram\L10n\Http\Middleware\SetLocale::class);
 
+        \Illuminate\Support\Facades\Blade::directive('tr', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::t($e)); ?>");
+        \Illuminate\Support\Facades\Blade::directive('trk', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::tKey(...[$e])); ?>");
 
-        Blade::directive('tr', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::t($e)); ?>");
-        Blade::directive('trk', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::tKey(...[$e])); ?>");
-
-        // توافق مع كودك الحالي إن وُجد
-        if (!class_exists('\\App\\Support\\Trans')) {
-            class_alias(Trans::class, '\\App\\Support\\Trans');
-        }
-        if (!function_exists('tr')) {
-            function tr(string $english, string $group = 'ui'): string { return Trans::t($english, $group); }
-        }
-        if (!function_exists('trk')) {
-            function trk(string $key, string $english, string $group = 'ui'): string { return Trans::tKey($key, $english, $group); }
-        }
+        // ✅ ديركتيات لترويس الـ HTML بدون تعديل يدوي متكرر
+        \Illuminate\Support\Facades\Blade::directive('htmlLang', fn() => "<?= app()->getLocale(); ?>");
+        \Illuminate\Support\Facades\Blade::directive('htmlDir',  fn() => "<?= app()->isLocale('ar') ? 'rtl' : 'ltr'; ?>");
     }
+
 }
