@@ -14,10 +14,19 @@ class L10nServiceProvider extends ServiceProvider
     }
 
     public function boot(): void
-    {
+    {  
         $this->publishes([__DIR__.'/../config/l10n.php' => config_path('l10n.php')], 'l10n-config');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'l10n');
         $this->loadRoutesFrom(__DIR__.'/../routes/l10n.php');
+
+        // تشغيل هجرات الباكج تلقائياً دون نشر
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        // اختياري: إتاحة publish للهجرات
+        $this->publishes([
+            __DIR__.'/../database/migrations' => database_path('migrations'),
+        ], 'l10n-migrations');
+
 
         Blade::directive('tr', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::t($e)); ?>");
         Blade::directive('trk', fn($e) => "<?php echo e(\\HananProgram\\L10n\\Support\\Trans::tKey(...[$e])); ?>");
