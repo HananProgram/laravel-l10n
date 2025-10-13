@@ -109,18 +109,17 @@
         </table>
       </div>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 min-w-0">
-        <div class="text-xs text-gray-600">
-          صفحة {{ $items->currentPage() }} من {{ $items->lastPage() }}
-        </div>
-    <div class="w-full sm:w-auto overflow-x-auto sm:max-w-full flex-shrink-0 -mx-4 sm:mx-0">
-  <div class="min-w-max inline-block px-4">{{ $items->links() }}</div>
+<div class="flex flex-col gap-3 pt-3 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+    <div class="text-xs text-gray-600 order-1 sm:order-none">
+        صفحة {{ $items->currentPage() }} من {{ $items->lastPage() }}
+    </div>
+    <div class="w-full overflow-x-auto -mx-4 sm:mx-0 order-2 sm:order-none">
+        <div class="inline-block min-w-max px-4">{{ $items->links() }}</div>
+    </div>
+    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto order-3 sm:order-none">
+        @tr('Save All')
+    </button>
 </div>
-
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">
-          @tr('Save All')
-        </button>
-      </div>
     </form>
   </div>
 </div>
