@@ -2,12 +2,12 @@
 @extends('layouts.superadmin')
 
 @section('content')
-<div class="p-6" dir="{{ app()->isLocale('ar') ? 'rtl' : 'ltr' }}">
-  <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">@tr('Translations')</h1>
+<div class="p-4 sm:p-6 w-full max-w-7xl sm:mx-auto" dir="{{ app()->isLocale('ar') ? 'rtl' : 'ltr' }}">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-6">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 break-words">@tr('Translations')</h1>
       <div class="flex items-center gap-2">
           <a href="{{ route('l10n.translate.index',['group'=>$group]) }}"
-             class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 rounded text-sm sm:text-base">
             @tr('Reset')
           </a>
       </div>
@@ -21,26 +21,26 @@
 
   {{-- Toolbar --}}
   <div class="bg-white p-4 rounded-lg shadow-md mb-4">
-    <form method="get" class="flex flex-wrap items-center gap-2" id="serverToolbar">
+    <form method="get" class="flex flex-wrap items-center gap-2 w-full" id="serverToolbar">
       <input name="q" id="q" value="{{ $q }}" placeholder="@tr('Search key or text')"
-             class="border px-3 py-2 rounded w-72 focus:ring focus:ring-blue-200" autocomplete="off">
-      <select name="group" class="border px-2 py-2 rounded focus:ring">
+              class="border px-3 py-2 rounded w-full sm:w-72 focus:ring focus:ring-blue-200" autocomplete="off">
+      <select name="group" class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
         <option value="ui" @selected($group==='ui')>ui</option>
         @foreach($groups as $g) @continue($g==='ui')
           <option value="{{ $g }}" @selected($group===$g)>{{ $g }}</option>
         @endforeach
       </select>
-      <select name="per" class="border px-2 py-2 rounded focus:ring">
+      <select name="group" class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
         @foreach([20,50,100] as $n) <option @selected($perPage==$n)>{{ $n }}</option> @endforeach
       </select>
 
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">@tr('Search')</button>
+      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">@tr('Search')</button>
 
       @php
         $missingEn = $items->filter(fn($i)=>empty($i->text['en'] ?? null))->count();
         $missingAr = $items->filter(fn($i)=>empty($i->text['ar'] ?? null))->count();
       @endphp
-      <div class="ms-auto flex items-center gap-2 text-sm">
+      <div class="w-full sm:w-auto sm:ms-auto flex flex-wrap items-center gap-2 text-sm">
         <button type="button" id="fEn"
           class="bg-blue-100 text-blue-800 px-3 py-1 rounded-md hover:bg-blue-200">
           EN @tr('missing'): <span id="countEn" class="ml-1 inline-block px-2 rounded bg-blue-200">{{ $missingEn }}</span>
@@ -64,11 +64,10 @@
     <form method="post" action="{{ route('l10n.translate.bulk') }}" id="bulkForm" class="space-y-2">
       @csrf
 
-      <div class="overflow-auto rounded border">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50">
+     <div class="overflow-x-auto rounded border">
+       <table class="min-w-[720px] sm:min-w-0 w-full text-sm">
+          <thead class="bg-gray-50 sticky top-0 z-10 text-xs sm:text-sm">
             <tr>
-              <th class="p-2 w-1/5 text-left text-gray-600">@tr('Key')</th>
               <th class="p-2 w-2/5 text-left text-gray-600">EN</th>
               <th class="p-2 w-2/5 text-left text-gray-600">AR</th>
               <th class="p-2 w-24 text-center text-gray-600">@tr('Actions')</th>
@@ -85,16 +84,15 @@
                 data-key="{{ $it->key }}"
                 data-missing-en="{{ $enEmpty ? '1':'0' }}"
                 data-missing-ar="{{ $arEmpty ? '1':'0' }}">
-              <td class="p-2 font-mono text-xs text-gray-700 cell-key">{{ $it->key }}</td>
 
               <td class="p-2 cell-en">
-                <input name="values_en[{{ $it->id }}]" value="{{ $it->text['en'] ?? '' }}"
+              <input name="values_en[{{ $it->id }}]" value="{{ $it->text['en'] ?? '' }}"
                        class="border px-2 py-1 rounded w-full focus:ring text-left
                        {{ $enEmpty ? 'bg-amber-50 border-amber-300' : '' }}">
               </td>
 
               <td class="p-2 cell-ar">
-                <input name="values_ar[{{ $it->id }}]" value="{{ $it->text['ar'] ?? '' }}"
+              <input name="values_ar[{{ $it->id }}]" value="{{ $it->text['ar'] ?? '' }}"
                        class="border px-2 py-1 rounded w-full focus:ring text-right
                        {{ $arEmpty ? 'bg-amber-50 border-amber-300' : '' }}">
               </td>
@@ -116,7 +114,7 @@
           صفحة {{ $items->currentPage() }} من {{ $items->lastPage() }}
         </div>
         <div>{{ $items->links() }}</div>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">
           @tr('Save All')
         </button>
       </div>
