@@ -24,13 +24,13 @@
     <form method="get" class="flex flex-wrap items-center gap-2 w-full" id="serverToolbar">
       <input name="q" id="q" value="{{ $q }}" placeholder="@tr('Search key or text')"
               class="border px-3 py-2 rounded w-full sm:w-72 focus:ring focus:ring-blue-200" autocomplete="off">
-      <select name="group" class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
+      <select name="per"   class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
         <option value="ui" @selected($group==='ui')>ui</option>
         @foreach($groups as $g) @continue($g==='ui')
           <option value="{{ $g }}" @selected($group===$g)>{{ $g }}</option>
         @endforeach
       </select>
-      <select name="group" class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
+      <select name="per"   class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
         @foreach([20,50,100] as $n) <option @selected($perPage==$n)>{{ $n }}</option> @endforeach
       </select>
 
@@ -64,7 +64,7 @@
     <form method="post" action="{{ route('l10n.translate.bulk') }}" id="bulkForm" class="space-y-2">
       @csrf
 
-     <div class="overflow-x-auto rounded border">
+     <div class="overflow-x-auto rounded border -mx-4 sm:mx-0">
        <table class="min-w-[720px] sm:min-w-0 w-full text-sm">
           <thead class="bg-gray-50 sticky top-0 z-10 text-xs sm:text-sm">
             <tr>
@@ -109,11 +109,14 @@
         </table>
       </div>
 
-      <div class="flex items-center justify-between pt-3">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 min-w-0">
         <div class="text-xs text-gray-600">
           صفحة {{ $items->currentPage() }} من {{ $items->lastPage() }}
         </div>
-        <div>{{ $items->links() }}</div>
+    <div class="w-full sm:w-auto overflow-x-auto sm:max-w-full flex-shrink-0 -mx-4 sm:mx-0">
+  <div class="min-w-max inline-block px-4">{{ $items->links() }}</div>
+</div>
+
         <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">
           @tr('Save All')
         </button>
