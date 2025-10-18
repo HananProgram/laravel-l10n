@@ -2,10 +2,10 @@
 @extends('layouts.superadmin')
 
 @section('content')
-<div class="p-4 sm:p-6 w-full max-w-7xl sm:mx-auto" dir="{{ app()->isLocale('ar') ? 'rtl' : 'ltr' }}">
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-6">
+ <div class="p-3 sm:p-4 md:p-6 w-full max-w-full sm:mx-0 min-w-0" dir="{{ app()->isLocale('ar') ? 'rtl' : 'ltr' }}">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-6 min-w-0">
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 break-words">@tr('Translations')</h1>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
           <a href="{{ route('l10n.translate.index',['group'=>$group]) }}"
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 rounded text-sm sm:text-base">
             @tr('Reset')
@@ -21,26 +21,26 @@
 
   {{-- Toolbar --}}
   <div class="bg-white p-4 rounded-lg shadow-md mb-4">
-    <form method="get" class="flex flex-wrap items-center gap-2 w-full" id="serverToolbar">
-      <input name="q" id="q" value="{{ $q }}" placeholder="@tr('Search key or text')"
-              class="border px-3 py-2 rounded w-full sm:w-72 focus:ring focus:ring-blue-200" autocomplete="off">
-      <select name="per"   class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
+    <form method="get" class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 w-full items-start" id="serverToolbar">
+     <input name="q" id="q" value="{{ $q }}" placeholder="@tr('Search key or text')" class="border px-3 py-2 rounded w-full sm:col-span-5 md:col-span-6 focus:ring focus:ring-blue-200 min-w-0" autocomplete="off">
+
+      <select name="group" class="border px-2 py-2 rounded focus:ring w-full sm:col-span-2 md:col-span-2">
         <option value="ui" @selected($group==='ui')>ui</option>
         @foreach($groups as $g) @continue($g==='ui')
           <option value="{{ $g }}" @selected($group===$g)>{{ $g }}</option>
         @endforeach
       </select>
-      <select name="per"   class="border px-2 py-2 rounded focus:ring w-full sm:w-auto">
+      <select name="per"   class="border px-2 py-2 rounded focus:ring w-full sm:col-span-2 md:col-span-2">
         @foreach([20,50,100] as $n) <option @selected($perPage==$n)>{{ $n }}</option> @endforeach
       </select>
 
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">@tr('Search')</button>
+       <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:col-span-3 md:col-span-2">@tr('Search')</button>
 
       @php
         $missingEn = $items->filter(fn($i)=>empty($i->text['en'] ?? null))->count();
         $missingAr = $items->filter(fn($i)=>empty($i->text['ar'] ?? null))->count();
       @endphp
-      <div class="w-full sm:w-auto sm:ms-auto flex flex-wrap items-center gap-2 text-sm">
+      <div class="w-full sm:col-span-12 flex flex-wrap items-center gap-2 text-sm sm:justify-end">
         <button type="button" id="fEn"
           class="bg-blue-100 text-blue-800 px-3 py-1 rounded-md hover:bg-blue-200">
           EN @tr('missing'): <span id="countEn" class="ml-1 inline-block px-2 rounded bg-blue-200">{{ $missingEn }}</span>
@@ -64,7 +64,7 @@
     <form method="post" action="{{ route('l10n.translate.bulk') }}" id="bulkForm" class="space-y-2">
       @csrf
 
-     <div class="overflow-x-auto rounded border -mx-4 sm:mx-0">
+     <div class="overflow-x-auto rounded border -mx-3 sm:mx-0 max-w-full">
        <table class="min-w-[720px] sm:min-w-0 w-full text-sm">
           <thead class="bg-gray-50 sticky top-0 z-10 text-xs sm:text-sm">
             <tr>
@@ -109,11 +109,11 @@
         </table>
       </div>
 
-<div class="flex flex-col gap-3 pt-3 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+<div class="flex flex-col gap-3 pt-3 min-w-0 w-full sm:flex-row sm:items-center sm:justify-between">
     <div class="text-xs text-gray-600 order-1 sm:order-none">
         صفحة {{ $items->currentPage() }} من {{ $items->lastPage() }}
     </div>
-    <div class="w-full overflow-x-auto -mx-4 sm:mx-0 order-2 sm:order-none">
+    <div class="w-full overflow-x-auto -mx-3 sm:mx-0 order-2 sm:order-none">
         <div class="inline-block min-w-max px-4">{{ $items->links() }}</div>
     </div>
     <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto order-3 sm:order-none">
