@@ -43,11 +43,12 @@
       <div class="w-full sm:col-span-12 flex flex-wrap items-center gap-2 text-sm sm:justify-end">
         <button type="button" id="fEn"
           class="bg-blue-100 text-blue-800 px-3 py-1 rounded-md hover:bg-blue-200">
-          EN @tr('missing'): <span id="countEn" class="ml-1 inline-block px-2 rounded bg-blue-200">{{ $missingEn }}</span>
+          EN @tr('missing'): <span id="countEn" class="inline-block px-2 rounded bg-blue-200 ltr:ml-1 rtl:mr-1">{{ $missingEn }}</span>
         </button>
         <button type="button" id="fAr"
           class="bg-blue-100 text-blue-800 px-3 py-1 rounded-md hover:bg-blue-200">
-          AR @tr('missing'): <span id="countAr" class="ml-1 inline-block px-2 rounded bg-blue-200">{{ $missingAr }}</span>
+          AR @tr('missing'): <span id="countAr" class="inline-block px-2 rounded bg-blue-200 ltr:ml-1 rtl:mr-1">{{ $missingAr }}</span>
+
         </button>
         <button type="button" id="fAll"
           class="bg-gray-100 text-gray-800 px-3 py-1 rounded-md hover:bg-gray-200">
@@ -65,11 +66,11 @@
       @csrf
 
      <div class="overflow-x-auto rounded border -mx-3 sm:mx-0 max-w-full">
-       <table class="min-w-[720px] sm:min-w-0 w-full text-sm">
+       <table class="min-w-[720px] sm:min-w-0 w-full text-sm ltr:text-left rtl:text-right">
           <thead class="bg-gray-50 sticky top-0 z-10 text-xs sm:text-sm">
             <tr>
-              <th class="p-2 w-2/5 text-left text-gray-600">EN</th>
-              <th class="p-2 w-2/5 text-left text-gray-600">AR</th>
+              <th class="p-2 w-2/5 ltr:text-left rtl:text-right text-gray-600">EN</th>
+              <th class="p-2 w-2/5 ltr:text-left rtl:text-right text-gray-600">AR</th>
               <th class="p-2 w-24 text-center text-gray-600">@tr('Actions')</th>
             </tr>
           </thead>
