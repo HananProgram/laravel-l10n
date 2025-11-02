@@ -13,11 +13,74 @@
       </div>
   </div>
 
-  @if(session('ok'))
-    <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
-      @tr('Saved successfully')
-    </div>
+  @php
+      use App\Support\Flash as FlashBag;
+
+      // اسحب وامسح فورًا
+      $messages = (array) session()->pull('flashes', []);
+
+      // دعم مفاتيح قديمة: ok, success, error, status
+      foreach (['ok','success','error','status'] as $legacy) {
+          if (session()->has($legacy)) {
+              $messages[] = FlashBag::normalize(
+                  session()->pull($legacy),
+                  $legacy === 'error' ? 'error' : 'success'
+              );
+          }
+      }
+
+      // إزالة التكرارات حسب النوع+العنوان+التفصيل
+      $seen = [];
+      $messages = array_values(
+          array_filter($messages, function ($m) use (&$seen) {
+              $k = ($m['type'] ?? '') . '|' . ($m['title'] ?? '') . '|' . ($m['detail'] ?? '');
+              if (isset($seen[$k])) return false;
+              $seen[$k] = true;
+              return true;
+          }),
+      );
+
+      $side = app()->isLocale('ar') ? 'left-3' : 'right-3';
+  @endphp
+
+  @if ($messages)
+      <div class="fixed {{ $side }} top-3 z-50 space-y-2 w-[90vw] max-w-80">
+          @foreach ($messages as $i => $m)
+              @php
+                  $bg = [
+                      'success' => 'bg-indigo-700', // كان أخضر
+                      'error'   => 'bg-red-600',
+                      'info'    => 'bg-slate-700',
+                      'warning' => 'bg-amber-600',
+                  ][$m['type']] ?? 'bg-slate-700';
+
+                  $id  = 'flash-' . $i;
+                  $dur = (int) ($m['duration'] ?? 3000);
+              @endphp
+
+              <div id="{{ $id }}" class="{{ $bg }} text-white rounded-lg shadow-md p-3 sm:p-4 transition-opacity duration-300">
+                  @if (!empty($m['title']))
+                      <p class="font-semibold">{{ $m['title'] }}</p>
+                  @endif
+                  @if (!empty($m['detail']))
+                      <p class="text-xs mt-1 opacity-90">{{ $m['detail'] }}</p>
+                  @endif
+              </div>
+
+              <script>
+                  (function () {
+                      const el = document.getElementById(@json($id));
+                      if (!el) return;
+                      setTimeout(() => {
+                          el.style.opacity = '0';
+                          setTimeout(() => el.remove(), 300);
+                      }, {{ $dur }});
+                  })();
+              </script>
+          @endforeach
+      </div>
   @endif
+
 
   {{-- Toolbar --}}
   <div class="bg-white p-4 rounded-lg shadow-md mb-4">
