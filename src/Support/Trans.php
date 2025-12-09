@@ -21,11 +21,17 @@ class Trans
 
         $line = LanguageLine::firstOrCreate(
             ['group' => $group, 'key' => $key],
-            ['text'  => ['en' => $english]]
+            ['text' => ['en' => $english]]
         );
 
         $text = $line->text ?? [];
-        $text['en'] = $text['en'] ?? $english;
+
+        // لو تغيّر النص الإنجليزي في الكود، اعتبره هو المصدر الحقيقي وحدّث الجدول
+        if (($text['en'] ?? '') !== $english && $english !== '') {
+            $text['en'] = $english;
+            $line->update(['text' => $text]);
+            cache()->forget("spatie.translation-loader.{$group}");
+        }
 
         if (empty($text['ar']) && config('l10n.auto_translate')) {
             if ($auto = AutoTranslator::translate($text['en'], 'ar', 'en')) {
