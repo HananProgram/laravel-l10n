@@ -26,11 +26,21 @@ class Trans
 
         $text = $line->text ?? [];
 
-        // لو تغيّر النص الإنجليزي في الكود، اعتبره هو المصدر الحقيقي وحدّث الجدول
-        if (($text['en'] ?? '') !== $english && $english !== '') {
-            $text['en'] = $english;
-            $line->update(['text' => $text]);
-            cache()->forget("spatie.translation-loader.{$group}");
+        $syncSourceEn = (bool) config('l10n.sync_source_en', false);
+
+        $enInDb = (string) ($text['en'] ?? '');
+        $english = (string) $english;
+
+        if ($english !== '') {
+            if ($enInDb === '') {
+                $text['en'] = $english;
+                $line->update(['text' => $text]);
+                cache()->forget("spatie.translation-loader.{$group}");
+            } elseif ($syncSourceEn && $enInDb !== $english) {
+                $text['en'] = $english;
+                $line->update(['text' => $text]);
+                cache()->forget("spatie.translation-loader.{$group}");
+            }
         }
 
         if (empty($text['ar']) && config('l10n.auto_translate')) {
@@ -42,6 +52,6 @@ class Trans
         }
 
         $locale = app()->getLocale() ?: 'en';
-        return $text[$locale] ?? $text['en'] ?? $english;
+        return $text[$locale] ?? ($text['en'] ?? $english);
     }
 }
