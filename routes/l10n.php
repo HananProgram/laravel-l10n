@@ -14,4 +14,6 @@ Route::middleware(config('l10n.admin_middleware', ['web','auth','App\Http\Middle
         Route::get('/translate', [TranslateController::class, 'index'])->name('l10n.translate.index');
         Route::post('/translate/update/{id}', [TranslateController::class, 'update'])->name('l10n.translate.update');
         Route::post('/translate/bulk', [TranslateController::class, 'bulk'])->name('l10n.translate.bulk');
+        Route::get('/translate/export', [TranslateController::class, 'export'])->name('l10n.translate.export');
+        Route::post('/translate/import', [TranslateController::class, 'import'])->name('l10n.translate.import');
     });

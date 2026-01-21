@@ -29,7 +29,9 @@ class TranslateController
             'missing',
             'EN missing',
             'AR missing',
-            'Saved successfully'
+            'Saved successfully',
+            'Export',
+            'Import'
         ] as $seed) {
             Trans::t($seed, $group);
         }
@@ -91,5 +93,88 @@ class TranslateController
             'message' => tr('Translations saved successfully!'),
             'type' => 'success',
         ]);
+    }
+
+    public function export()
+    {
+        $group = request('group', config('l10n.default_group', 'ui'));
+        $translations = LanguageLine::where('group', $group)->orderBy('key')->get();
+
+        $data = $translations->map(function ($t) {
+            return [
+                'key' => $t->key,
+                'en'  => $t->text['en'] ?? $t->key,
+                'ar'  => $t->text['ar'] ?? '',
+            ];
+        })->toArray();
+
+        $fileName = 'translations_'.$group.'_'.now()->format('Y-m-d_H-i-s').'.json';
+
+        return response()->streamDownload(function () use ($data) {
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }, $fileName, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    public function import(Request $r)
+    {
+        $r->validate([
+            'import_file' => ['required', 'file', 'mimetypes:application/json,text/json,text/plain', 'max:10240'],
+            'group'       => ['required', 'string'],
+        ]);
+
+        try {
+            $content = file_get_contents($r->file('import_file')->getRealPath());
+            $data = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+                return back()->with('error', tr('Invalid JSON file format'));
+            }
+
+            $group = $r->get('group');
+            $imported = 0;
+            $updated = 0;
+            $skipped = 0;
+
+            \DB::beginTransaction();
+            foreach ($data as $item) {
+                if (!isset($item['key']) || empty($item['key'])) {
+                    $skipped++;
+                    continue;
+                }
+
+                $text = [
+                    'en' => $item['en'] ?? $item['key'] ?? '',
+                    'ar' => $item['ar'] ?? '',
+                ];
+
+                $line = LanguageLine::where('group', $group)->where('key', $item['key'])->first();
+
+                if ($line) {
+                    $line->update(['text' => $text]);
+                    $updated++;
+                } else {
+                    LanguageLine::create([
+                        'group' => $group,
+                        'key'   => $item['key'],
+                        'text'  => $text,
+                    ]);
+                    $imported++;
+                }
+            }
+            \DB::commit();
+
+            cache()->flush();
+
+            $msg = tr('Imported').": $imported, ".tr('Updated').": $updated";
+            if ($skipped > 0) $msg .= ", ".tr('Skipped').": $skipped";
+
+            return back()->with('ok', $msg);
+
+        } catch (\Throwable $e) {
+            \DB::rollBack();
+            return back()->with('error', tr('Failed to import').': '.$e->getMessage());
+        }
     }
 }

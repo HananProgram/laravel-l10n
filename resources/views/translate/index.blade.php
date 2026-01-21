@@ -6,6 +6,22 @@
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-6 min-w-0">
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 break-words">@tr('Translations')</h1>
       <div class="flex items-center gap-2 shrink-0">
+          <a href="{{ route('l10n.translate.export', ['group' => $group]) }}"
+              class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-3 py-2 rounded text-sm sm:text-base flex items-center gap-2">
+              <span>@tr('Export')</span>
+          </a>
+
+          <form action="{{ route('l10n.translate.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="hidden">
+              @csrf
+              <input type="hidden" name="group" value="{{ $group }}">
+              <input type="file" name="import_file" id="importFile" accept=".json" onchange="document.getElementById('importForm').submit()">
+          </form>
+
+          <button type="button" onclick="document.getElementById('importFile').click()"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-2 rounded text-sm sm:text-base flex items-center gap-2">
+              <span>@tr('Import')</span>
+          </button>
+
           <a href="{{ route('l10n.translate.index',['group'=>$group]) }}"
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 rounded text-sm sm:text-base">
             @tr('Reset')
